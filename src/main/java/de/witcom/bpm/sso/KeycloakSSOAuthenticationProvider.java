@@ -11,14 +11,14 @@ import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
 import org.keycloak.KeycloakPrincipal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin.
  */
 public class KeycloakSSOAuthenticationProvider extends ContainerBasedAuthenticationProvider {
-    private static Log log = LogFactory.getLog(KeycloakSSOAuthenticationProvider.class);
+    private static Logger log = LoggerFactory.getLogger(KeycloakSSOAuthenticationProvider.class);
 
     @Override
     public AuthenticationResult extractAuthenticatedUser(HttpServletRequest request, ProcessEngine engine) {
