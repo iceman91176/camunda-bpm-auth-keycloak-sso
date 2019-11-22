@@ -1,4 +1,5 @@
-# camunda-sso-tomcat
+# Camunda SSO for WebApps / REST-API
+Enables SSO to Web-Apps / REST-API. Uses https://github.com/camunda/camunda-bpm-identity-keycloak as Identity-Provider, so there is no need to configure groups in Camunda
 
 ## Tomcat Preparation
 
