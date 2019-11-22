@@ -36,6 +36,7 @@ public class KeycloakAuthenticationFilter implements Filter {
         if (System.getenv("KC_FILTER_CLAIM_GROUPS")!=null &&
        		 !System.getenv("KC_FILTER_CLAIM_GROUPS").isEmpty()) {
         	this.claimGroups = System.getenv("KC_FILTER_CLAIM_GROUPS");
+        	log.debug("Getting camunda-groups form claim {}",this.claimGroups);
        }
     }
 
@@ -60,8 +61,6 @@ public class KeycloakAuthenticationFilter implements Filter {
 
         }
         log.debug("Got username "+name+" from token");
-
-        
         AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
         
         try {
@@ -85,6 +84,9 @@ public class KeycloakAuthenticationFilter implements Filter {
 
     /**
      * Get user groups from Access-Token claims
+     * It is not possible to get the groups from the keycloak-identity-plugin
+     * because in case of a keycloak-client that performs the the api-call, the user-id
+     * is not a real keycloak-user
      * 
      * @param accessToken
      * @return Array-List of groups
