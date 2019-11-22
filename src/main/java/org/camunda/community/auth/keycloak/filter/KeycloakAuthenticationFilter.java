@@ -1,4 +1,4 @@
-package de.witcom.bpm.filter;
+package org.camunda.community.auth.keycloak.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
+import org.camunda.community.auth.keycloak.KeycloakHelper;
 import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
@@ -31,6 +32,11 @@ public class KeycloakAuthenticationFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) {
         log.info("Init KeycloakAuthenticationFilter");
+        //Set group claim from env if available
+        if (System.getenv("KC_FILTER_CLAIM_GROUPS")!=null &&
+       		 !System.getenv("KC_FILTER_CLAIM_GROUPS").isEmpty()) {
+        	this.claimGroups = System.getenv("KC_FILTER_CLAIM_GROUPS");
+       }
     }
 
     @Override
@@ -45,10 +51,8 @@ public class KeycloakAuthenticationFilter implements Filter {
             clearAuthentication(engine);
             return;
         }
-
-        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-        String name = accessToken.getPreferredUsername();
-
+        
+        String name = KeycloakHelper.getUsernameFromPrincipal(principal);
         if (name == null || name.isEmpty()) {
             log.warn("Username is null - auth not possible");
             clearAuthentication(engine);
@@ -57,6 +61,9 @@ public class KeycloakAuthenticationFilter implements Filter {
         }
         log.debug("Got username "+name+" from token");
 
+        
+        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
+        
         try {
             engine.getIdentityService().setAuthentication(name, getUserGroups(accessToken));
             chain.doFilter(request, response);
@@ -76,7 +83,14 @@ public class KeycloakAuthenticationFilter implements Filter {
         engine.getIdentityService().clearAuthentication();
     }
 
-    private List<String> getUserGroups(AccessToken accessToken){
+    /**
+     * Get user groups from Access-Token claims
+     * 
+     * @param accessToken
+     * @return Array-List of groups
+     */
+    @SuppressWarnings("unchecked")
+	private List<String> getUserGroups(AccessToken accessToken){
 
         List<String> groupIds = new ArrayList<String>();
         Map<String, Object> otherClaims = accessToken.getOtherClaims();

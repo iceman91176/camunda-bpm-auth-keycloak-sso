@@ -1,6 +1,6 @@
 package de.witcom.bpm.sso;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -9,6 +9,7 @@ import org.junit.Test;
  */
 public class AppTest
 {
+	private String claimGroups = "groupIds";
     /**
      * Rigorous Test :-)
      */
@@ -17,4 +18,5 @@ public class AppTest
     {
         assertTrue( true );
     }
+    
 }
