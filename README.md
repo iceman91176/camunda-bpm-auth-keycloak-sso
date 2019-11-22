@@ -3,8 +3,7 @@ Enables SSO to Web-Apps / REST-API. Uses https://github.com/camunda/camunda-bpm-
 
 ## Keycloak Configuration
 
-For Details see: https://github.com/iceman91176/camunda-bpm-identity-keycloak
-
+For Details see: https://github.com/camunda/camunda-bpm-identity-keycloak
 OR
 
 * Create confidential client with service-accounts enabled
