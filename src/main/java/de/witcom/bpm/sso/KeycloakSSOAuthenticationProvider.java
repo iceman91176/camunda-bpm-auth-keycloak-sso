@@ -42,8 +42,6 @@ public class KeycloakSSOAuthenticationProvider extends ContainerBasedAuthenticat
 
         return authenticationResult;
 
-
-
     }
 
     private List<String> getUserGroups(String userId, ProcessEngine engine){

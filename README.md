@@ -27,32 +27,46 @@ Get [keycloak-tomcat-adapter-dist-8.0.0.tar.gz](https://downloads.jboss.org/keyc
 
 Copy the remaining jars to CATALINA_HOME/lib/
 
+Add Keycloak Servlet Filter Adapter to CATALINA_HOME/lib
+
+```
+wget https://repo1.maven.org/maven2/org/keycloak/keycloak-servlet-filter-adapter/8.0.0/keycloak-servlet-filter-adapter-8.0.0.jar
+wget https://repo1.maven.org/maven2/org/keycloak/keycloak-servlet-adapter-spi/8.0.0/keycloak-servlet-adapter-spi-8.0.0.jar
+```
+
 ### Configure camunda-bpm-identity-keycloak Library
 
-Configure the plugin in CATALINA_HOME/conf
+Configure the plugin in CATALINA_HOME/conf - to make it configurable (e.g. in containerized environments) it is recommended to reference system properties.
 
 ```
 <plugin>
         <class>org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
         <properties>
 
-            <property name="keycloakIssuerUrl">https://URL/auth/realms/REALM</property>
-            <property name="keycloakAdminUrl">https://URL/auth/admin/realms/REALM</property>
-            <property name="clientId">camunda-demo-engine</property>
-            <property name="clientSecret">aaaaa-fdc0-4a36-yyyy-b21623f74a52</property>
-            <property name="useUsernameAsCamundaUserId">true</property>
-            <property name="useGroupPathAsCamundaGroupId">true</property>
-            <property name="administratorGroupName">camunda-admin</property>
-            <property name="disableSSLCertificateValidation">true</property>
+            <property name="keycloakIssuerUrl">${KEYCLOAK_ISSUER_URL}</property>
+            <property name="keycloakAdminUrl">${KEYCLOAK_ADMIN_URL}</property>
+            <property name="clientId">${KEYCLOAK_CLIENT_ID}</property>
+            <property name="clientSecret">${KEYCLOAK_CLIENT_ID}</property>
+            <property name="useUsernameAsCamundaUserId">${KC_PLUGIN_USERNAME_AS_ID}true</property>
+            <property name="useGroupPathAsCamundaGroupId">${KC_PLUGIN_GROUPPATH_AS_ID}</property>
+            <property name="administratorGroupName">${KC_PLUGIN_ADMIN_GROUP}</property>
+            <property name="disableSSLCertificateValidation">${KC_PLUGIN_DISABLE_SSL_VALIDATION}</property>
+            <property name="authorizationCheckEnabled">${KC_PLUGIN_ENABLE_AUTH_CHECK}</property>
 
         </properties>
     </plugin>
 ```
 
+### Create keycloak-adpater configuration file
+Get the client keycloak.json file and place it in a central folder, e.g. $CAMUNDA_HOME/conf
+
 ### Configure SSO for Camunda-WebApps
 
 * Copy camunda-sso-tomat JAR to CATALINA_HOME/webapps/camunda/WEB-INF/lib
-* Copy keycloak.json (get it from keycloak web-ui) to CATALINA_HOME/webapps/camunda/WEB-INF
-* Create CATALINA_HOME/webapps/camunda/META-INF/context.xml (see src/assembly)
 * Modify CATALINA_HOME/webapps/camunda/WEB-INF/web.xml (see src/assembly/camunda-web.xml)
+
+### Configure SSO for Camunda-REST-Engine
+
+* Copy camunda-sso-tomat JAR to CATALINA_HOME/webapps/engine-rest/WEB-INF/lib
+* Modify CATALINA_HOME/webapps/engine-rest/WEB-INF/web.xml (see src/assembly/engine-rest-web.xml)
 
