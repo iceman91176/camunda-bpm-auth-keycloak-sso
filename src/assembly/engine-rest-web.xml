@@ -18,7 +18,7 @@ Add after cache-control-filter/filter-mapping
 <!-- Camunda Keycloak Authentication Filter -->
   <filter>
     <filter-name>camunda-auth</filter-name>
-    <filter-class>de.witcom.bpm.filter.KeycloakAuthenticationFilter</filter-class>
+    <filter-class>org.camunda.community.auth.keycloak.filter.KeycloakAuthenticationFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>camunda-auth</filter-name>

@@ -21,7 +21,7 @@ Add before Authentication-Filter
     <filter-class>org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter</filter-class>
     <init-param>
       <param-name>authentication-provider</param-name>
-      <param-value>de.witcom.bpm.sso.KeycloakSSOAuthenticationProvider</param-value>
+      <param-value>org.camunda.community.auth.keycloak.sso.KeycloakSSOAuthenticationProvider</param-value>
     </init-param>
   </filter>
   <filter-mapping>
