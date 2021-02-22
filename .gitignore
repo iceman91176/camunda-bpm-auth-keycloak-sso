@@ -1,4 +1,6 @@
 target/*
+**/target/*
+.*.tmp
 bin/
 build/
 .gradle
