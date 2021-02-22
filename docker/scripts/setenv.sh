@@ -38,8 +38,6 @@ if [[ -n "${KEYCLOAK_GROUP_PATH_AS_ID+x}" ]]; then
   CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_GROUP_PATH_AS_ID=${KEYCLOAK_GROUP_PATH_AS_ID}"
 fi
 
-echo $CATALINA_OPTS
-
 if [[ -n "${KEYCLOAK_BASE_URL+x}" &&  -n "${KEYCLOAK_REALM+x}" &&  -n "${KEYCLOAK_CLIENT_ID+x}" &&  -n "${KEYCLOAK_CLIENT_SECRET+x}" ]]; then
 
 cat <<EOF > /camunda/webapps/camunda/WEB-INF/keycloak.json
