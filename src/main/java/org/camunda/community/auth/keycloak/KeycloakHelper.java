@@ -12,10 +12,11 @@ public class KeycloakHelper {
 	public static String getUsernameFromPrincipal(KeycloakPrincipal<?> principal) {
 		
 		String name = null;
-		boolean useUsernameAsCamundaUserId=Boolean.parseBoolean(System.getenv("KC_PLUGIN_USERNAME_AS_ID"));
+
+		boolean useUsernameAsCamundaUserId=Boolean.parseBoolean(System.getenv("KEYCLOAK_USERNAME_AS_ID"));
         boolean useEmailAsCamundaUserId=false;
         if (!useUsernameAsCamundaUserId) {
-        	useEmailAsCamundaUserId=Boolean.parseBoolean(System.getenv("KC_PLUGIN_EMAIL_AS_ID"));
+        	useEmailAsCamundaUserId=Boolean.parseBoolean(System.getenv("KEYCLOAK_EMAIL_AS_ID"));
         }
         if ((!useUsernameAsCamundaUserId) && (!useEmailAsCamundaUserId)) {
         	log.debug("Retrieve username from principal-name (keycloak-id)");
@@ -28,7 +29,7 @@ public class KeycloakHelper {
         	log.debug("Retrieve username from eMail-Adress");
         	name = principal.getKeycloakSecurityContext().getToken().getEmail();
         }
-        
+       
 		return name;
 		
 	}

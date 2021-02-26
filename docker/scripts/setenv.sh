@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CLASSPATH=$CLASSPATH:$CATALINA_HOME/conf/logback/
 CATALINA_OPTS="";
 
 if [[ -n "${KEYCLOAK_BASE_URL+x}" && -n "${KEYCLOAK_REALM+x}" ]]; then
@@ -8,14 +9,16 @@ fi
 
 if [[ -n "${KEYCLOAK_CLIENT_SECRET+x}" ]]; then
   CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}"
+  KC_FILTER_CLIENT_ID=$KEYCLOAK_CLIENT_SECRET;
 fi
 
-if [[ -n "${KC_FILTER_CLIENT_ID+x}" ]]; then
-  CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_CLIENT_ID=${KC_FILTER_CLIENT_ID}"
+if [[ -n "${KEYCLOAK_CLIENT_ID+x}" ]]; then
+  CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}"
 fi
 
-if [[ -n "${KC_PLUGIN_USERNAME_AS_ID+x}" ]]; then
-  CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_USERNAME_AS_ID=${KC_PLUGIN_USERNAME_AS_ID}"
+if [[ -n "${KEYCLOAK_USERNAME_AS_ID+x}" ]]; then
+  CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_USERNAME_AS_ID=${KEYCLOAK_USERNAME_AS_ID}";
+  KC_PLUGIN_USERNAME_AS_ID=$KEYCLOAK_PLUGIN_USERNAME_AS_ID;
 fi
 
 if [[ -n "${KEYCLOAK_ADMINISTRATOR_GROUP_NAME+x}" ]]; then
@@ -30,9 +33,9 @@ if [[ -n "${KEYCLOAK_AUTHORIZATION_CHECK_ENABLED+x}" ]]; then
   CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_AUTHORIZATION_CHECK_ENABLED=${KEYCLOAK_AUTHORIZATION_CHECK_ENABLED}"
 fi
 
-if [[ -n "${KC_PLUGIN_USERNAME_AS_ID+x}" ]]; then
-  CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_USERNAME_AS_ID=${KC_PLUGIN_USERNAME_AS_ID}"
-fi
+#if [[ -n "${KC_PLUGIN_USERNAME_AS_ID+x}" ]]; then
+#  CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_USERNAME_AS_ID=${KC_PLUGIN_USERNAME_AS_ID}"
+#fi
 
 if [[ -n "${KEYCLOAK_GROUP_PATH_AS_ID+x}" ]]; then
   CATALINA_OPTS="$CATALINA_OPTS -DKEYCLOAK_GROUP_PATH_AS_ID=${KEYCLOAK_GROUP_PATH_AS_ID}"
@@ -45,7 +48,7 @@ cat <<EOF > /camunda/webapps/camunda/WEB-INF/keycloak.json
   "realm": "${KEYCLOAK_REALM}",
   "auth-server-url": "${KEYCLOAK_BASE_URL}",
   "ssl-required": "external",
-  "resource": "${KC_FILTER_CLIENT_ID}",
+  "resource": "${KEYCLOAK_CLIENT_ID}",
   "verify-token-audience": true,
   "credentials": {
     "secret": "${KEYCLOAK_CLIENT_SECRET}"
@@ -60,7 +63,7 @@ cat <<EOF > /camunda/webapps/engine-rest/WEB-INF/keycloak.json
   "realm": "${KEYCLOAK_REALM}",
   "auth-server-url": "${KEYCLOAK_BASE_URL}",
   "ssl-required": "external",
-  "resource": "${KC_FILTER_CLIENT_ID}",
+  "resource": "${KEYCLOAK_CLIENT_ID}",
   "verify-token-audience": true,
   "credentials": {
     "secret": "${KEYCLOAK_CLIENT_SECRET}"

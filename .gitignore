@@ -8,3 +8,4 @@ build/
 .project
 .settings
 src/main/webapp/WEB-INF/keycloak.json
+**/.attach_*

@@ -37,17 +37,17 @@ public class KeycloakAuthenticationFilter implements Filter {
     public void init(FilterConfig filterConfig) {
         log.info("Init KeycloakAuthenticationFilter");
         //Set group claim from env if available
-        if (System.getenv("KC_FILTER_CLAIM_GROUPS")!=null &&
-       		 !System.getenv("KC_FILTER_CLAIM_GROUPS").isEmpty()) {
-        	this.claimGroups = System.getenv("KC_FILTER_CLAIM_GROUPS");
+        if (System.getenv("KEYCLOAK_FILTER_CLAIM_GROUPS")!=null &&
+       		 !System.getenv("KEYCLOAK_FILTER_CLAIM_GROUPS").isEmpty()) {
+        	this.claimGroups = System.getenv("KEYCLOAK_FILTER_CLAIM_GROUPS");
         	this.groupsFromClaim=true;
         	log.debug("Getting camunda-groups from claim {}",this.claimGroups);
-       } else if (System.getenv("KC_FILTER_CLIENT_ID")!=null &&
-          		 !System.getenv("KC_FILTER_CLIENT_ID").isEmpty()) {
-    	   this.camundaResourceServer = System.getenv("KC_FILTER_CLIENT_ID");
+       } else if (System.getenv("KEYCLOAK_CLIENT_ID")!=null &&
+          		 !System.getenv("KEYCLOAK_CLIENT_ID").isEmpty()) {
+    	   this.camundaResourceServer = System.getenv("KEYCLOAK_CLIENT_ID");
     	   log.debug("Getting camunda-groups from resource-server {} roles",this.camundaResourceServer);
        } else {
-    	   log.warn("Neither KC_FILTER_CLAIM_GROUPS nor KC_FILTER_CLIENT_ID are configured - we won't be able to get groups from JWTs");
+    	   log.warn("Neither KEYCLOAK_FILTER_CLAIM_GROUPS nor KEYCLOAK_CLIENT_ID are configured - we won't be able to get groups from JWTs");
        }
         
     }
@@ -64,8 +64,17 @@ public class KeycloakAuthenticationFilter implements Filter {
             clearAuthentication(engine);
             return;
         }
+        log.debug("Got principal ",principal.toString());
+        String name=null;
+        try {
+        	name = principal.getKeycloakSecurityContext().getToken().getPreferredUsername();
+        } catch (Exception e ){
+            log.warn("Unable to extract username from principal - auth not possible");
+            clearAuthentication(engine);
+            return;
+        }
         
-        String name = KeycloakHelper.getUsernameFromPrincipal(principal);
+        //String name = KeycloakHelper.getUsernameFromPrincipal(principal);
         if (name == null || name.isEmpty()) {
             log.warn("Username is null - auth not possible");
             clearAuthentication(engine);

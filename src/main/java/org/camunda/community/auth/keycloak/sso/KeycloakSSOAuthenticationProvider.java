@@ -31,7 +31,7 @@ public class KeycloakSSOAuthenticationProvider extends ContainerBasedAuthenticat
             return AuthenticationResult.unsuccessful();
         }
         
-        String name = KeycloakHelper.getUsernameFromPrincipal(principal);
+        String name =  KeycloakHelper.getUsernameFromPrincipal(principal);
         if (name == null || name.isEmpty()) {
         	log.warn("No username found in token - auth not possible");
             return AuthenticationResult.unsuccessful();
