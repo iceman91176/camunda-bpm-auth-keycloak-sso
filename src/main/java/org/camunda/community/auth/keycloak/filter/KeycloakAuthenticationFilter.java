@@ -65,6 +65,7 @@ public class KeycloakAuthenticationFilter implements Filter {
             return;
         }
         log.debug("Got principal ",principal.toString());
+        /*
         String name=null;
         try {
         	name = principal.getKeycloakSecurityContext().getToken().getPreferredUsername();
@@ -73,8 +74,9 @@ public class KeycloakAuthenticationFilter implements Filter {
             clearAuthentication(engine);
             return;
         }
+        */
         
-        //String name = KeycloakHelper.getUsernameFromPrincipal(principal);
+        String name = KeycloakHelper.getUsernameFromPrincipal(principal);
         if (name == null || name.isEmpty()) {
             log.warn("Username is null - auth not possible");
             clearAuthentication(engine);

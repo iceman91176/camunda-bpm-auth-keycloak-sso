@@ -21,7 +21,6 @@ public class KeycloakHelper {
         if ((!useUsernameAsCamundaUserId) && (!useEmailAsCamundaUserId)) {
         	log.debug("Retrieve username from principal-name (keycloak-id)");
         	name = principal.getName();
-        	
         } else if (useUsernameAsCamundaUserId) {
         	log.debug("Retrieve username from preferred-username");
         	name = principal.getKeycloakSecurityContext().getToken().getPreferredUsername();
