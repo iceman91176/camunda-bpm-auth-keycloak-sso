@@ -69,7 +69,13 @@
 			<version>${keycloak.version}</version>
 		</dependency>
 
-
+<!--
+		<dependency>
+		  <groupId>io.digitalstate.camunda.logging</groupId>
+		  <artifactId>camunda-json-logging-tomcat</artifactId>
+		  <version>7.14.0</version>
+		</dependency>
+-->
 
 		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-tomcat-adapter-dist -->
 		<dependency>
@@ -100,14 +106,44 @@
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>jul-to-slf4j</artifactId>
-    <version>1.7.30</version>
+    <version>1.7.26</version>
 </dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.7.26</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-jdk14</artifactId>
+    <version>1.7.26</version>
+</dependency>
+-->
+
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>jul-to-slf4j</artifactId>
+    <version>1.7.26</version>
+</dependency>
+
 <dependency>
     <groupId>ch.qos.logback</groupId>
     <artifactId>logback-classic</artifactId>
     <version>1.2.3</version>
+<exclusions>
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>slf4j-api</artifactId>
+                                </exclusion>
+</exclusions>
 </dependency>
--->
+<!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
+<dependency>
+    <groupId>net.logstash.logback</groupId>
+    <artifactId>logstash-logback-encoder</artifactId>
+    <version>5.3</version>
+</dependency>
+
 	</dependencies>
 
 </project>

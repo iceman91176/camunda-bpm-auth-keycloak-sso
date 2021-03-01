@@ -1,4 +1,5 @@
 DOCKER_CMD         ?= docker
+CAMUNDA_RELEASE ?= 7.14.x
 
 .third-party-libs-$(CAMUNDA_RELEASE).tmp: third-party-libs/$(CAMUNDA_RELEASE)/pom.xml
 	test -d tmp || mkdir tmp
