@@ -3,6 +3,13 @@ FROM camunda/camunda-bpm-platform:tomcat-7.14.0
 ARG CAMUNDA_RELEASE
 
 ###
+# Fix permissions
+###
+USER root
+RUN chown -R 1000:0 /camunda && chmod -Rf 770 /camunda && chmod -Rf 775 /camunda/*.sh && chmod -Rf 775 /camunda/bin/*.sh
+USER camunda
+
+###
 # Cleanup unneeded stuff 
 ###
 
