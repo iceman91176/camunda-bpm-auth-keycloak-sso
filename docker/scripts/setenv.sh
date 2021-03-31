@@ -1,6 +1,7 @@
 #!/bin/bash
 
-CLASSPATH=$CLASSPATH:$CATALINA_HOME/conf/logback/
+#export CLASSPATH=$CATALINA_HOME/lib/jul-to-slf4j-$SLF4J_VERSION.jar:$CATALINA_HOME/lib/slf4j-api-$SLF4J_VERSION.jar:$CATALINA_HOME/conf/logback/
+export CLASSPATH=$CATALINA_HOME/conf/logback/
 CATALINA_OPTS="";
 
 if [[ -n "${KEYCLOAK_BASE_URL+x}" && -n "${KEYCLOAK_REALM+x}" ]]; then
