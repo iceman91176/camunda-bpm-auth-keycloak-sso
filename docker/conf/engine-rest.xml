@@ -43,6 +43,7 @@
   <filter>
     <filter-name>KeyCloak OpenID Connect Filter</filter-name>
     <filter-class>org.keycloak.adapters.servlet.KeycloakOIDCFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>KeyCloak OpenID Connect Filter</filter-name>
@@ -54,6 +55,7 @@
   <filter>
     <filter-name>camunda-auth</filter-name>
     <filter-class>org.camunda.community.auth.keycloak.filter.KeycloakAuthenticationFilter</filter-class>
+    <async-supported>true</async-supported> 
   </filter>
   <filter-mapping>
     <filter-name>camunda-auth</filter-name>
