@@ -1,130 +1,93 @@
 # Camunda SSO for WebApps / REST-API
 Enables SSO to Web-Apps / REST-API. Uses https://github.com/camunda/camunda-bpm-identity-keycloak as Identity-Provider, so there is no need to configure groups in Camunda
 
-## Keycloak Configuration
+Runs as a fully configurable docker-image.
 
+## Issues with Camunda Groups and the Keycloak identity-plugin
+Unfortunately it is not possible to user Keycloak-Roles only with the keycloak-identity-plugin. Basically it boils down to the facts that keycloak can only retrieve directly assigned users of a role.
+
+See details https://github.com/camunda/camunda-bpm-identity-keycloak/issues/3
+
+Groups alone are not working for Keycloak-Service-Accounts, so we need roles anyway. Our approach is to have both groups and roles with the same name. Roles are added to the corresponding groups. This is a little bit cumbersome.
+For those that don't use the REST-API - you can skip the roles alltogether.
+
+## Keycloak Configuration
 For Details see: https://github.com/camunda/camunda-bpm-identity-keycloak
-OR
+
+AND/OR
 
 * Create confidential client with service-accounts enabled
 * Add valid Redirect-URL (Base-URL of your camunda webapp, eg https://my.domain.org/camunda/*
 * Give the client the permission to query users&groups and to view users
-* Create Camunda-Admin group, and add user(s) to it
+* Be sure that roles are added to your JWT (this is the default behaviour of Keycloak)
+* Create camunda-admin role in your client
+* Create Camunda-Admin group, assign the camunda-admin role to it
+* Add user(s) to the admin-group
 
-### REST-API Clients
+### Service-Account REST-API Client
+If you have a "machine" client that has to connect to the REST-API, do the following
 
-If you have REST-API clients only, you have to set the groupmemberships in a claim in the access-token. 
+* Create confidential client with service-accounts enabled only (no standard flow)
+* enable service-accounts
+* Add the required roles to this service-account
+* Be sure that roles are added to your JWT (this is the default behaviour of Keycloak)
 
-Create confidential client with service-accounts enabled only (no stadard flow)
+The roles have to exists as groups have in Keycloak. If you don't have the identity-plugin configured to use goup-names (useGroupPathAsCamundaGroupId), you have send the internal-id of the group in the claim
 
-Create script mapper 
-
-Claim-Name : groupIds
-
-```
-var ArrayList = Java.type('java.util.ArrayList');
-var list = new ArrayList();
-list.add("camunda-special-group");
-list.add("camunda-task-reader");
-token.setOtherClaims("groupIds",list);
-```
-
-Mapper has to be **multivalued**, and has to be added to the access-token
-
-The groups have to exist in Keycloak, otherwise the identity-plugin can't find them.
-If you don't have the identity-plugin configured to use goup-names (useGroupPathAsCamundaGroupId),
-you have send the internal-id of the group in the claim
-
-## Tomcat Preparation
-
-### Add Camunda camunda-bpm-identity-keycloak Library
-Get camunda-bpm-identity-keycloak-1.3.0-SNAPSHOT.jar and copy it to CATALINA_HOME/lib/
-
-Add dependencies to CATALINA_HOME/lib/
+## Build Docker-Image
+Allthough it is possible to it non-dockerized, this README will focus on how to build the docker-image.
+Requirement: Build this PLUGIN and either push it to a maven-repository that is available to you, or build and install it on your local box.
 
 ```
-wget https://repo1.maven.org/maven2/org/springframework/spring-web/5.1.8.RELEASE/spring-web-5.1.8.RELEASE.jar
-wget https://repo1.maven.org/maven2/org/springframework/spring-beans/5.1.8.RELEASE/spring-beans-5.1.8.RELEASE.jar
-wget https://repo1.maven.org/maven2/org/springframework/spring-jcl/5.1.8.RELEASE/spring-jcl-5.1.8.RELEASE.jar
-wget https://repo1.maven.org/maven2/org/apache/httpcomponents/httpclient/4.5.9/httpclient-4.5.9.jar
-wget https://repo1.maven.org/maven2/org/apache/httpcomponents/httpcore/4.4.11/httpcore-4.4.11.jar
-wget https://repo1.maven.org/maven2/commons-codec/commons-codec/1.11/commons-codec-1.11.jar
-wget https://repo1.maven.org/maven2/org/springframework/spring-core/5.1.8.RELEASE/spring-core-5.1.8.RELEASE.jar
-```
+ mvn install
+ cd ./docker
+ make
+``` 
 
-### Add Keycloak-Adapter Libraries
+This build a docker-image bases on camunda/camunda-bpm-platform:tomcat-7.14.0. It also adds logback-logging with JSON-Format, and removes the default processes, so that you can start from scratch (just to warn you). 
 
-Get [keycloak-tomcat-adapter-dist-8.0.0.tar.gz](https://downloads.jboss.org/keycloak/8.0.0/adapters/keycloak-oidc/keycloak-tomcat-adapter-dist-8.0.0.tar.gz) and extract somewhere. Remove the following files, since they are alreaydy provided
+It builds the image with the following name camunda-7.14.x-identity-keycloak:<RELEASE>
 
-* httpclient-*.jar
-* httpcore-*.jar
-* commons-codec-*.jar
-
-Copy the remaining jars to CATALINA_HOME/lib/
-
-Add Keycloak Servlet Filter Adapter to CATALINA_HOME/lib
+### Custom-Tags
+Create custom-tag as needed
 
 ```
-wget https://repo1.maven.org/maven2/org/keycloak/keycloak-servlet-filter-adapter/8.0.0/keycloak-servlet-filter-adapter-8.0.0.jar
-wget https://repo1.maven.org/maven2/org/keycloak/keycloak-servlet-adapter-spi/8.0.0/keycloak-servlet-adapter-spi-8.0.0.jar
-```
+ make docker_tag DOCKER_ORG=my-org DOCKER_REPO=my.registry.org
+``` 
 
-### Configure camunda-bpm-identity-keycloak Library
+That will tag the image as follows
 
-Configure the plugin in CATALINA_HOME/conf - to make it configurable (e.g. in containerized environments) it is recommended to reference system properties.
+* my.registry.org/my-org/camunda-7.14.x-identity-keycloak:<RELEASE>
+* my.registry.org/my-org/camunda-7.14.x-identity-keycloak:latest
 
-```
-<plugin>
-        <class>org.camunda.bpm.extension.keycloak.plugin.KeycloakIdentityProviderPlugin</class>
-        <properties>
-
-            <property name="keycloakIssuerUrl">${KEYCLOAK_ISSUER_URL}</property>
-            <property name="keycloakAdminUrl">${KEYCLOAK_ADMIN_URL}</property>
-            <property name="clientId">${KEYCLOAK_CLIENT_ID}</property>
-            <property name="clientSecret">${KEYCLOAK_CLIENT_SECRET}</property>
-            <property name="useUsernameAsCamundaUserId">${KC_PLUGIN_USERNAME_AS_ID}true</property>
-            <property name="useGroupPathAsCamundaGroupId">${KC_PLUGIN_GROUPPATH_AS_ID}</property>
-            <property name="administratorGroupName">${KC_PLUGIN_ADMIN_GROUP}</property>
-            <property name="disableSSLCertificateValidation">${KC_PLUGIN_DISABLE_SSL_VALIDATION}</property>
-            <property name="authorizationCheckEnabled">${KC_PLUGIN_ENABLE_AUTH_CHECK}</property>
-
-        </properties>
-    </plugin>
-```
-
-The values KC_PLUGIN_USERNAME_AS_ID and KC_PLUGIN_EMAIL_AS_ID are used in the SSO-Plugin also,
-so it makes sense to provide them as ENV-Variables
-
-You can either modify CATALINA_HOME/bin/setenv.sh to set add the system-properties like that
+### Using podman ?
 
 ```
-CATALINA_OPTS="other stuff -DKC_PLUGIN_USERNAME_AS_ID=$KC_PLUGIN_USERNAME_AS_ID -DKEYCLOAK_CLIENT_SECRET=$KEYCLOAK_CLIENT_SECRET ...."
+ make DOCKER_CMD=podman
+``` 
+
+## Run
+Just pass the needed ENV-Vars. See Configuration 
+
 ```
-
-or just modify/set JAVA_OPTS before starting tomcat (which might be the easiest solution for containerized deyployments)
-
-## SSO-Plugin
-
-### Create keycloak-adapter configuration file
-Get the client keycloak.json file and place it in a central folder, e.g. $CAMUNDA_HOME/conf
+docker run --rm -p 8080:8080 \
+ -e KEYCLOAK_BASE_URL=https://auth.dev.witcom.services/auth \
+ -e KEYCLOAK_REALM=witcom \
+ -e KEYCLOAK_CLIENT_ID=camunda-resource-server \
+ -e KC_PLUGIN_USERNAME_AS_ID=true \
+ -e KEYCLOAK_CLIENT_SECRET=SECRET \
+ camunda-7.14.x-identity-keycloak:1.2.0
+```
 
 ### Configuration
-The SSO-Plugin can be configured by setting env-variables (except the keycloak-client-configuration, which has to done with the keycloak.json file)
+The SSO-Plugin can be configured by setting env-variables (except the keycloak-client-configuration, which has to done with the keycloak.json file) In the docker-image this is done automagically ;-)
 
-| *Variable* | *Description* |
-| --- | --- |
-| `KC_PLUGIN_EMAIL_AS_ID` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br/>Both keycloak-identity-service AND SSO-Plugin have to be configured identical.|
-| `KC_PLUGIN_USERNAME_AS_ID` | Whether to use the Keycloak preferred-username attribute as Camunda's user ID. Default is `false`. In the default case the plugin will use the internal Keycloak ID as Camunda's user ID.<br/>Both keycloak-identity-service AND SSO-Plugin have to be configured identical.<br/>*Note*:takes precedence over KC_PLUGIN_EMAIL_AS_ID |
-| `KC_FILTER_CLAIM_GROUPS` | For rest-engine filter only. Defines in which claim of the Access-Token the client's groups are listed.. Default is `groupIds`. Useful for keycloak "Service-Accounts" which are no real users, and have no group membership.  |
+It re-uses some of the variables introduced by camunda-bpm-identity-keycloak
 
-
-### Configure SSO for Camunda-WebApps
-
-* Copy camunda-bpm-auth-keycloak-sso JAR to CATALINA_HOME/webapps/camunda/WEB-INF/lib
-* Modify CATALINA_HOME/webapps/camunda/WEB-INF/web.xml (see src/assembly/camunda-web.xml)
-
-### Configure SSO for Camunda-REST-Engine
-
-* Copy camunda-bpm-auth-keycloak-sso JAR to CATALINA_HOME/webapps/engine-rest/WEB-INF/lib
-* Modify CATALINA_HOME/webapps/engine-rest/WEB-INF/web.xml (see src/assembly/engine-rest-web.xml)
+| *Variable* | *Description* | *Used in camunda-bpm-identity-keycloak ?* |
+| --- | --- |--- |
+| `KEYCLOAK_EMAIL_AS_ID` | Whether to use the Keycloak email attribute as Camunda's user ID. Default is `false`.<br/>Both keycloak-identity-service AND SSO-Plugin have to be configured identical.| YES|
+| `KEYCLOAK_USERNAME_AS_ID` | Whether to use the Keycloak preferred-username attribute as Camunda's user ID. Default is `false`. In the default case the plugin will use the internal Keycloak ID as Camunda's user ID.<br/>Both keycloak-identity-service AND SSO-Plugin have to be configured identical.<br/>*Note*:takes precedence over KEYCLOAK_EMAIL_AS_ID | YES|
+| `KEYCLOAK_CLIENT_ID` | Camunda Keycloak-Resource-server| YES|
+| `KEYCLOAK_FILTER_CLAIM_GROUPS` | Defines in which claim of the Access-Token the client's groups are listed. You only need that if you don't use keycloak default roles  | NO|
 

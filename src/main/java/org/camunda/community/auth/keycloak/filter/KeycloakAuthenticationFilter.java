@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -22,22 +24,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin.
+ * OAuth2 Authentication Filter for usage with Keycloak. Protects REST-ENGINE.
  */
 public class KeycloakAuthenticationFilter implements Filter {
     private static Logger log = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
 
-    private String claimGroups = "groupIds";
+    private String claimGroups = null;
+    private boolean groupsFromClaim = false;
+    private String camundaResourceServer = "";
 
     @Override
     public void init(FilterConfig filterConfig) {
         log.info("Init KeycloakAuthenticationFilter");
         //Set group claim from env if available
-        if (System.getenv("KC_FILTER_CLAIM_GROUPS")!=null &&
-       		 !System.getenv("KC_FILTER_CLAIM_GROUPS").isEmpty()) {
-        	this.claimGroups = System.getenv("KC_FILTER_CLAIM_GROUPS");
-        	log.debug("Getting camunda-groups form claim {}",this.claimGroups);
+        if (System.getenv("KEYCLOAK_FILTER_CLAIM_GROUPS")!=null &&
+       		 !System.getenv("KEYCLOAK_FILTER_CLAIM_GROUPS").isEmpty()) {
+        	this.claimGroups = System.getenv("KEYCLOAK_FILTER_CLAIM_GROUPS");
+        	this.groupsFromClaim=true;
+        	log.debug("Getting camunda-groups from claim {}",this.claimGroups);
+       } else if (System.getenv("KEYCLOAK_CLIENT_ID")!=null &&
+          		 !System.getenv("KEYCLOAK_CLIENT_ID").isEmpty()) {
+    	   this.camundaResourceServer = System.getenv("KEYCLOAK_CLIENT_ID");
+    	   log.debug("Getting camunda-groups from resource-server {} roles",this.camundaResourceServer);
+       } else {
+    	   log.warn("Neither KEYCLOAK_FILTER_CLAIM_GROUPS nor KEYCLOAK_CLIENT_ID are configured - we won't be able to get groups from JWTs");
        }
+        
     }
 
     @Override
@@ -52,6 +64,8 @@ public class KeycloakAuthenticationFilter implements Filter {
             clearAuthentication(engine);
             return;
         }
+        log.debug("Got principal ",principal.toString());
+
         
         String name = KeycloakHelper.getUsernameFromPrincipal(principal);
         if (name == null || name.isEmpty()) {
@@ -83,10 +97,11 @@ public class KeycloakAuthenticationFilter implements Filter {
     }
 
     /**
-     * Get user groups from Access-Token claims
-     * It is not possible to get the groups from the keycloak-identity-plugin
-     * because in case of a keycloak-client that performs the the api-call, the user-id
-     * is not a real keycloak-user
+     * Get user groups from Access-Token claims or from resource-access
+     * 
+     * It is not always possible to get the groups from the keycloak-identity-plugin
+     * because in case of a keycloak-service-account  that performs the the api-call, the user-id
+     * is not a real user
      * 
      * @param accessToken
      * @return Array-List of groups
@@ -95,10 +110,24 @@ public class KeycloakAuthenticationFilter implements Filter {
 	private List<String> getUserGroups(AccessToken accessToken){
 
         List<String> groupIds = new ArrayList<String>();
-        Map<String, Object> otherClaims = accessToken.getOtherClaims();
-        if (otherClaims.containsKey(claimGroups)) {
-		    groupIds = (ArrayList<String>) otherClaims.get(claimGroups);
-            log.debug("Found groups in token " + groupIds.toString());
+
+        //Get groups from claim
+        if(this.groupsFromClaim) {
+	        Map<String, Object> otherClaims = accessToken.getOtherClaims();
+	        if (otherClaims.containsKey(claimGroups)) {
+			    groupIds = (ArrayList<String>) otherClaims.get(claimGroups);
+	            log.debug("Found groups in token " + groupIds.toString());
+	        }
+        } else {
+	        //extract groups from resource_access roles        
+	        if(accessToken.getResourceAccess().containsKey(this.camundaResourceServer)) {
+	        	Set<String> roles = accessToken.getResourceAccess(this.camundaResourceServer).getRoles();
+	        	groupIds = (ArrayList<String>) roles.stream().collect(Collectors.toList());
+	        	log.debug("Found groups in resource-access " + groupIds.toString());
+	        }
+        }
+        if (groupIds.isEmpty()) {
+        	log.warn("Found no groups in JWT");
         }
         return groupIds;
     }

@@ -1,0 +1,149 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<groupId>org.camunda.bpm.extension</groupId>
+	<version>1.0.0-SNAPSHOT</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>sso-thirdparty-libs</artifactId>
+	<packaging>pom</packaging>
+
+	<properties>
+		<keycloak.version>11.0.3</keycloak.version>
+		<camunda.identity-keycloak.version>2.0.0</camunda.identity-keycloak.version>
+		<camunda.auth-keycloak-sso.version>1.2</camunda.auth-keycloak-sso.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>jcenter</id>
+			<url>https://jcenter.bintray.com/</url>
+		</repository>
+		<repository>
+			<id>jboss-public-repository</id>
+			<name>JBoss Repository</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<repository>
+			<id>camunda-bpm-nexus</id>
+			<name>camunda-bpm-nexus</name>
+			<url>https://app.camunda.com/nexus/repository/camunda-bpm/</url>
+		</repository>
+
+		<repository>
+			<id>camunda-bpm-community-extensions</id>
+			<name>camunda-bpm-community-extensions</name>
+			<url>https://app.camunda.com/nexus/repository/camunda-bpm-community-extensions/</url>
+		</repository>
+
+	</repositories>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.camunda.bpm.extension</groupId>
+			<artifactId>camunda-bpm-identity-keycloak-all</artifactId>
+			<version>${camunda.identity-keycloak.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-servlet-filter-adapter -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-servlet-filter-adapter</artifactId>
+			<version>${keycloak.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-servlet-adapter-spi -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-servlet-adapter-spi</artifactId>
+			<version>${keycloak.version}</version>
+		</dependency>
+
+<!--
+		<dependency>
+		  <groupId>io.digitalstate.camunda.logging</groupId>
+		  <artifactId>camunda-json-logging-tomcat</artifactId>
+		  <version>7.14.0</version>
+		</dependency>
+-->
+
+		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-tomcat-adapter-dist -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-tomcat-adapter</artifactId>
+			<version>${keycloak.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpclient</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>httpcore</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+
+				</exclusion>
+				<exclusion>
+					<groupId>commons-codec</groupId>
+					<artifactId>commons-codec</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+<!--
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>jul-to-slf4j</artifactId>
+    <version>1.7.26</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.7.26</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-jdk14</artifactId>
+    <version>1.7.26</version>
+</dependency>
+-->
+
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>jul-to-slf4j</artifactId>
+    <version>1.7.26</version>
+</dependency>
+
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.2.3</version>
+<exclusions>
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>slf4j-api</artifactId>
+                                </exclusion>
+</exclusions>
+</dependency>
+<!-- https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
+<dependency>
+    <groupId>net.logstash.logback</groupId>
+    <artifactId>logstash-logback-encoder</artifactId>
+    <version>5.3</version>
+</dependency>
+
+	</dependencies>
+
+</project>
