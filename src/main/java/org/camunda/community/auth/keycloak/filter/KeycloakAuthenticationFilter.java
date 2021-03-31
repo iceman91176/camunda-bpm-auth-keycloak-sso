@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * OAuth2 Authentication Provider for usage with Keycloak and KeycloakIdentityProviderPlugin.
+ * OAuth2 Authentication Filter for usage with Keycloak. Protects REST-ENGINE.
  */
 public class KeycloakAuthenticationFilter implements Filter {
     private static Logger log = LoggerFactory.getLogger(KeycloakAuthenticationFilter.class);
@@ -65,16 +65,7 @@ public class KeycloakAuthenticationFilter implements Filter {
             return;
         }
         log.debug("Got principal ",principal.toString());
-        /*
-        String name=null;
-        try {
-        	name = principal.getKeycloakSecurityContext().getToken().getPreferredUsername();
-        } catch (Exception e ){
-            log.warn("Unable to extract username from principal - auth not possible");
-            clearAuthentication(engine);
-            return;
-        }
-        */
+
         
         String name = KeycloakHelper.getUsernameFromPrincipal(principal);
         if (name == null || name.isEmpty()) {
@@ -108,9 +99,9 @@ public class KeycloakAuthenticationFilter implements Filter {
     /**
      * Get user groups from Access-Token claims or from resource-access
      * 
-     * It is not possible to get the groups from the keycloak-identity-plugin
-     * because in case of a keycloak-client that performs the the api-call, the user-id
-     * is not a real keycloak-user
+     * It is not always possible to get the groups from the keycloak-identity-plugin
+     * because in case of a keycloak-service-account  that performs the the api-call, the user-id
+     * is not a real user
      * 
      * @param accessToken
      * @return Array-List of groups

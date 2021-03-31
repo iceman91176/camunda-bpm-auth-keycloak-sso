@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * OAuth2 Authentication Provider for usage with Keycloak and
- * KeycloakIdentityProviderPlugin.
+ * KeycloakIdentityProviderPlugin. Used for SSO to Camunda-Webapps 
  */
 public class KeycloakSSOAuthenticationProvider extends ContainerBasedAuthenticationProvider {
 	private static Logger log = LoggerFactory.getLogger(KeycloakSSOAuthenticationProvider.class);
@@ -52,6 +52,14 @@ public class KeycloakSSOAuthenticationProvider extends ContainerBasedAuthenticat
 
 	}
 
+	/**
+	 * Get user groups from JWT - if this does not contain roles (groups), fall back to identity-provider
+	 * 
+	 * @param userId
+	 * @param accessToken
+	 * @param engine
+	 * @return List of user-groups the user belongs to
+	 */
 	private List<String> getUserGroups(String userId, AccessToken accessToken, ProcessEngine engine) {
 		String claimGroups;
 		String camundaResourceServer;
