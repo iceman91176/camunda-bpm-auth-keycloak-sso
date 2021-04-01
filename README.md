@@ -45,7 +45,7 @@ Requirement: Build this PLUGIN and either push it to a maven-repository that is 
  make
 ``` 
 
-This builds a docker-image based on camunda/camunda-bpm-platform:tomcat-7.14.0. It also adds logback-logging with JSON-Format, and removes the default processes, so that you can start from scratch (just to warn you). 
+This builds a docker-image based on camunda/camunda-bpm-platform:tomcat-7.14.0.
 
 It builds the image with the following name camunda-7.14.x-identity-keycloak:<RELEASE>
 
