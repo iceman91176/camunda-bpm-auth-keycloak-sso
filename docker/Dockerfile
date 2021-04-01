@@ -1,17 +1,7 @@
-FROM camunda/camunda-bpm-platform:tomcat-7.14.0
+ARG BASE=camunda/camunda-bpm-platform:tomcat-7.14.0
+FROM $BASE
 
 ARG CAMUNDA_RELEASE
-
-###
-# Prepare logback
-###
-
-RUN rm -rf ./lib/slf4j-jdk14-*.jar && mkdir conf/logback
-#ENV SLF4J_VERSION=1.7.26 \
-#    LOGBACK_VERSION=1.2.3 \
-#    LOGSTASH_LOGBACK_ENCODER_VERSION=5.3 \
-#    JACKSON_DATABIND_VERSION=2.10.4 \
-#    JACKSON_ANNOTATIONS_VERSION=2.10.4
 
 ###
 # Fix permissions
@@ -19,12 +9,6 @@ RUN rm -rf ./lib/slf4j-jdk14-*.jar && mkdir conf/logback
 USER root
 RUN chown -R 1000:0 /camunda && chmod -Rf 770 /camunda && chmod -Rf 775 /camunda/*.sh && chmod -Rf 775 /camunda/bin/*.sh
 USER camunda
-
-###
-# Cleanup unneeded stuff 
-###
-
-RUN rm -rf webapps/camunda-invoice webapps/camunda-welcome webapps/manager webapps/host-manager webapps/examples webapps/ROOT 
 
 ENV KEYCLOAK_USERNAME_AS_ID=true \
     KEYCLOAK_DISABLE_SSL_CERTIFICATE_VALIDATION=true \
@@ -48,16 +32,15 @@ COPY webapp-libs/${CAMUNDA_RELEASE}/target/dependency/ webapps/camunda/WEB-INF/l
 COPY engine-rest-libs/${CAMUNDA_RELEASE}/target/dependency/ webapps/engine-rest/WEB-INF/lib/
 
 #####
-# Copy scripts
+# "Copy" scripts
 #####
-COPY scripts/ bin/
+COPY scripts/ temp/
+RUN cat temp/setenv_add.sh >> bin/setenv.sh && rm temp/setenv_add.sh
 
 #####
 # Copy configs
 #####
 COPY conf/bpm-platform.xml conf/bpm-platform.xml
-COPY conf/logback/logback.xml conf/logback/logback.xml
-COPY conf/logging.properties conf/logging.properties
 COPY conf/webapp-sso.xml webapps/camunda/WEB-INF/web.xml
 COPY conf/engine-rest.xml webapps/engine-rest/WEB-INF/web.xml
 

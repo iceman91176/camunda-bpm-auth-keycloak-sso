@@ -7,7 +7,7 @@
 
 	<groupId>de.witcom.bpm</groupId>
 	<artifactId>camunda-bpm-auth-keycloak-sso</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 
 	<name>camunda-bpm-auth-keycloak-sso</name>
 	<url>https://github.com/iceman91176/camunda-bpm-auth-keycloak-sso</url>
