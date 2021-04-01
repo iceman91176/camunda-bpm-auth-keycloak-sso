@@ -68,7 +68,7 @@ Just pass the needed ENV-Vars. See Configuration
 
 ```
 docker run --rm -p 8080:8080 \
- -e KEYCLOAK_BASE_URL=https://auth.dev.witcom.services/auth \
+ -e KEYCLOAK_BASE_URL=https://xxx/auth \
  -e KEYCLOAK_REALM=witcom \
  -e KEYCLOAK_CLIENT_ID=camunda-resource-server \
  -e KEYCLOAK_CLIENT_SECRET=SECRET \
