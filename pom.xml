@@ -19,7 +19,7 @@
 		<classes.dir>${project.build.directory}/extracted-camunda-webapp</classes.dir>
 		<camunda.version>7.14.0</camunda.version>
 		<camunda.identity-keycloak.version>2.0.0</camunda.identity-keycloak.version>
-		<keycloak.version>11.0.3</keycloak.version>
+		<keycloak.version>13.0.0</keycloak.version>
 	</properties>
 
 	<dependencies>
