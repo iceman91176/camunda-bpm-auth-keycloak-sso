@@ -59,6 +59,7 @@ It builds the image with the following name camunda-7.14.x-identity-keycloak:<RE
 | `DOCKER_REPO` | Used in target docker_tag to prefix the built image  | some-repo.org|
 | `DOCKER_ORG` | Used in target docker_tag to prefix the built image  | witcom|
 | `DOCKER_RELEASE` | Tag for the built image  | 1.3 |
+| `DOCKER_BUILD_ARGS` | Additional build-args | - |
 | `IDENTITY_KEYCLOAK_RELEASE` | Version of identity-plugin to use  | 2.0.0 |
 | `AUTH_KEYCLOAK_RELEASE` | Version of this plugin to use  | 1.3 |
 

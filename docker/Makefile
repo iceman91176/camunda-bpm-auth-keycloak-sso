@@ -4,6 +4,7 @@ CAMUNDA_RELEASE ?= 7.14.x
 DOCKER_REPO ?= some-repo.org 
 DOCKER_ORG ?= witcom
 DOCKER_RELEASE ?= 1.3
+DOCKER_BUILD_ARGS ?=
 IDENTITY_KEYCLOAK_RELEASE ?= 2.0.0
 AUTH_KEYCLOAK_RELEASE ?= 1.3
 
@@ -23,7 +24,7 @@ AUTH_KEYCLOAK_RELEASE ?= 1.3
 	touch .webapp-libs-$(CAMUNDA_RELEASE).tmp
 
 docker_build: .third-party-libs-$(CAMUNDA_RELEASE).tmp .webapp-libs-$(CAMUNDA_RELEASE).tmp .engine-rest-libs-$(CAMUNDA_RELEASE).tmp
-	$(DOCKER_CMD) build --build-arg CAMUNDA_RELEASE=$(CAMUNDA_RELEASE) --build-arg=$(BASE) . -t camunda-$(CAMUNDA_RELEASE)-identity-keycloak:$(DOCKER_RELEASE)
+	$(DOCKER_CMD) build $(DOCKER_BUILD_ARGS) --build-arg CAMUNDA_RELEASE=$(CAMUNDA_RELEASE) --build-arg=BASE=$(BASE) . -t camunda-$(CAMUNDA_RELEASE)-identity-keycloak:$(DOCKER_RELEASE)
 
 docker_tag:
 	$(DOCKER_CMD) tag camunda-$(CAMUNDA_RELEASE)-identity-keycloak:$(DOCKER_RELEASE) $(DOCKER_REPO)/$(DOCKER_ORG)/camunda-$(CAMUNDA_RELEASE)-identity-keycloak:$(DOCKER_RELEASE)
