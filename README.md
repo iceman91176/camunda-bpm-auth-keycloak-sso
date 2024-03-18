@@ -1,3 +1,7 @@
+# THIS REPOSITORY IS UNMAINTAINED !! 
+
+We switched to Camunda Zeebe and therefore have no need for this integration anymore. Habe a look at https://github.com/camunda-community-hub/camunda-platform-7-keycloak, which supports more recent versions aof camunda.
+
 # Camunda SSO for WebApps / REST-API
 Enables SSO to Web-Apps / REST-API. Uses https://github.com/camunda/camunda-bpm-identity-keycloak as Identity-Provider, so there is no need to configure groups in Camunda
 
